@@ -1,0 +1,12 @@
+{
+  "name": "websockettest",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "express": "^4.15.2",
+    "extend": "^3.0.1",
+    "socket.io": "^2.0.2",
+    "socketcluster": "^5.13.1",
+    "socketcluster-client": "^5.5.0"
+  }
+}
