@@ -11,7 +11,9 @@
   <div class="container">
     <div class="messages">
       <ul id="messages-list"></ul>
+      <!--<div id="msg_end" style="height:0px; overflow:hidden"></div>-->
     </div>
+
     <div class="actions">
       <form>
         <input id="message" autocomplete="off" placeholder="Type a message...">
@@ -24,6 +26,14 @@
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
   <script type="text/javascript">
     var socket = socketCluster.connect();
+    // var socket = socketCluster.connect({
+    //   port: 4000,
+    //   //hostname: "xxx.xxx.xxx.xxx",
+    //   hostname: "127.0.0.1",
+    //   //path: '/private-cloud-service',
+    //   //path: '/rssec/scservice',
+    //   secure: false
+    // });
 
     socket.on('error', function (err) {
       throw 'Socket error - ' + err;
@@ -37,10 +47,17 @@
       if ($('#message').val() != '') {
         socket.emit('chat', $('#message').val());
       }
+      else {
+        socket.emit('chat', { action: 'save', data: { a: 1, b: '2' } });
+      }
 
       $('#message').val('')
 
       return false;
+    });
+
+    socket.on('rand', function (data) {
+      console.log('RANDOM STREAM: ', data, socket.id);
     });
 
     var chatChannel = socket.subscribe('yell');
@@ -50,7 +67,17 @@
     });
 
     chatChannel.watch(function (data) {
-      $('#messages-list').append($('<li>').text(data));
+      if (Object.prototype.toString.call(data) === '[object String]') {
+        $('#messages-list').append($('<li>').text(data));
+      }
+      else {
+        $('#messages-list').append($('<li>').text(JSON.stringify(data, null, 2)));
+      }
+
+      //     msg_end.scrollIntoView(); 
+      // $('#messages').scrollTop = $('#messages').scrollHeight;
+      // console.debug($('#messages').scrollTop());
+      // console.debug($('#messages').scrollHeight());
     });
   </script>
 </body>
