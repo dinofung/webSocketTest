@@ -43,12 +43,51 @@
       console.log('Connected to server');
     });
 
+    // let fileChannel = {watch:function(){}};
+    // let cellChannel = {watch:function(){}};
+
+    function FileJoin() {
+      let fileId = 'AAA';
+      if (!socket.isSubscribed(fileId)) {
+
+        let fileChannel = socket.subscribe(fileId);
+        fileChannel.watch(function (data) {
+          console.debug('watch', data);
+          if (data && data.action && typeof eval(data.action) === 'function') {
+            eval(data.action)(data.result)
+              // .then()
+              // .catch()
+              ;
+          }
+        });
+       
+      }
+
+ fileChannel.publish({msg:"this is client publish data."},function(error){
+          
+        });
+        
+      socket.on(fileId, function (data) {
+        console.log(fileId + ' emit listen data', data);
+        socket.off(fileId);
+      });
+
+      socket.emit('dosomething', { action: 'fileJoin', data: { fileId: fileId } });
+
+    }
+
+    function loadFile(data) {
+      console.log('loadFile', data);
+    }
+
     $('form').submit(function () {
       if ($('#message').val() != '') {
         socket.emit('chat', $('#message').val());
+
       }
       else {
-        socket.emit('chat', { action: 'save', data: { a: 1, b: '2' } });
+        //  socket.emit('chat', { action: 'save', data: { a: 1, b: '2' } });
+        FileJoin();
       }
 
       $('#message').val('')
@@ -61,11 +100,7 @@
     });
 
     var chatChannel = socket.subscribe('yell');
-
-    chatChannel.on('subscribeFail', function (err) {
-      console.log('Failed to subscribe to Yell channel due to error: ' + err);
-    });
-
+    
     chatChannel.watch(function (data) {
       if (Object.prototype.toString.call(data) === '[object String]') {
         $('#messages-list').append($('<li>').text(data));
@@ -73,11 +108,14 @@
       else {
         $('#messages-list').append($('<li>').text(JSON.stringify(data, null, 2)));
       }
-
       //     msg_end.scrollIntoView(); 
       // $('#messages').scrollTop = $('#messages').scrollHeight;
       // console.debug($('#messages').scrollTop());
       // console.debug($('#messages').scrollHeight());
+    });
+
+    chatChannel.on('subscribeFail', function (err) {
+      console.log('Failed to subscribe to Yell channel due to error: ' + err);
     });
   </script>
 </body>

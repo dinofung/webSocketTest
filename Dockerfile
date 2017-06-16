@@ -1,4 +1,5 @@
-FROM node:6.3.0-slim
+FROM node:boron
+
 MAINTAINER Jonathan Gros-Dubois
 
 LABEL description="Docker file for SocketCluster with support for clustering."
